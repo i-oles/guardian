@@ -1,4 +1,4 @@
-FROM balenalib/raspberry-pi-debian-golang:1.21.3
+FROM arm32v7/golang:latest
 
 WORKDIR /app
 
