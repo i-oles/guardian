@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN go mod download
-RUN go build -o guardian .
+RUN go build -o guardian ./cmd
 
 EXPOSE 8080
 
