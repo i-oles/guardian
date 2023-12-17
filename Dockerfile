@@ -1,4 +1,4 @@
-FROM arm32v7/golang:latest
+FROM arm64v8/golang:latest
 
 WORKDIR /app
 
