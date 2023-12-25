@@ -1,0 +1,5 @@
+{
+  "DBFileName": "db.json",
+  "MockBulbs" :  false,
+  "IsDebugOn" :  true
+}
