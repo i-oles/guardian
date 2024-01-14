@@ -5,6 +5,7 @@ go 1.21.3
 require (
 	github.com/akominch/yeelight v1.0.6
 	github.com/gin-gonic/gin v1.9.1
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/tkanos/gonfig v0.0.0-20210106201359-53e13348de2f
 )
 

@@ -13,12 +13,12 @@ const (
 )
 
 func GetConfig(cfgBasePath string, cfgAddr any) error {
-	cfgFlag := flag.String("cfg", "", "config name to load from")
+	profile := flag.String("profile", "", "config name to load from")
 	flag.Parse()
 
 	configName := defaultConfigName
-	if *cfgFlag != "" {
-		configName = *cfgFlag
+	if *profile != "" {
+		configName = *profile
 	}
 
 	cfgPath := filepath.Join(cfgBasePath, configName+ext)

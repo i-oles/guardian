@@ -2,6 +2,7 @@ package toggle
 
 import (
 	"cmd/main.go/internal/httpapi"
+	"cmd/main.go/internal/model"
 	"fmt"
 	"github.com/akominch/yeelight"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,7 @@ type errorHandler interface {
 }
 
 type bulbGetter interface {
-	Get(ip string) error
+	Get(ip string) (model.Bulb, error)
 }
 
 type Handler struct {
@@ -44,18 +45,27 @@ func (h *Handler) Handle(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		h.errorHandler.Handle(ctx, http.StatusBadRequest,
-			fmt.Errorf("could not bind toggleRequest: %w", err))
+			fmt.Errorf("could not bind toggleRequest: %w", err),
+		)
+
+		return
 	}
 
-	//TODO: implement bulb model and add it to getter return
-	if err := h.bulbGetter.Get(req.IP); err != nil {
+	_, err := h.bulbGetter.Get(req.IP)
+	if err != nil {
 		h.errorHandler.Handle(ctx, http.StatusBadRequest,
-			fmt.Errorf("could not find bulb %s", req.IP))
+			fmt.Errorf("could not find bulb %s", req.IP),
+		)
+
+		return
 	}
 
 	if err := toggleBulb(req.IP); err != nil {
 		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
-			fmt.Errorf("could not toggle bulb %s", req.IP))
+			fmt.Errorf("could not toggle bulb %s", req.IP),
+		)
+
+		return
 	}
 
 	ctx.JSON(

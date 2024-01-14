@@ -3,9 +3,10 @@ package config
 import "encoding/json"
 
 type Configuration struct {
-	DBFileName string
-	MockBulbs  bool
-	IsDebugOn  bool
+	DBFileName   string
+	BulbCollName string
+	MockBulbs    bool
+	IsDebugOn    bool
 }
 
 func (c *Configuration) Pretty() string {

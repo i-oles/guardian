@@ -1,5 +1,6 @@
 {
-  "DBFileName": "db.json",
+  "DBFileName": "guardian.db",
   "MockBulbs" :  false,
-  "IsDebugOn" :  true
+  "IsDebugOn" :  true,
+  "BulbCollName" : "bulbs"
 }

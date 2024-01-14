@@ -9,6 +9,7 @@ import (
 	configuration "cmd/main.go/pkg/config"
 	"database/sql"
 	"github.com/gin-gonic/gin"
+	"log"
 	"log/slog"
 )
 
@@ -20,12 +21,14 @@ func main() {
 		slog.Error(err.Error())
 	}
 
+	log.Println(cfg.Pretty())
+
 	db, err := sql.Open("sqlite3", cfg.DBFileName)
 	if err != nil {
 		slog.Error(err.Error())
 	}
 
-	bulbRepo := sqlite.NewRepo(db)
+	bulbRepo := sqlite.NewBulbsRepo(db, cfg.BulbCollName)
 
 	homeHandler := home.NewHandler()
 	toggleHandler := toggle.NewHandler(errorHandler.New("toggle", cfg.IsDebugOn), bulbRepo)
