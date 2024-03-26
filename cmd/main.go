@@ -6,6 +6,7 @@ import (
 	"cmd/main.go/internal/feature/home"
 	"cmd/main.go/internal/feature/toggle"
 	"cmd/main.go/internal/repository/sqlite"
+	"cmd/main.go/internal/repository/ylight"
 	configuration "cmd/main.go/pkg/config"
 	"database/sql"
 	"github.com/gin-gonic/gin"
@@ -29,9 +30,13 @@ func main() {
 	}
 
 	bulbRepo := sqlite.NewBulbsRepo(db, cfg.BulbCollName)
+	yeeLightRepo := ylight.NewYLight()
 
-	homeHandler := home.NewHandler()
-	toggleHandler := toggle.NewHandler(errorHandler.New("toggle", cfg.IsDebugOn), bulbRepo)
+	homeHandler := home.NewHandler(bulbRepo)
+	toggleHandler := toggle.NewHandler(
+		errorHandler.New("toggle", cfg.IsDebugOn),
+		bulbRepo,
+		yeeLightRepo)
 
 	GETs := map[string]gin.HandlerFunc{
 		"/": homeHandler.Handle,

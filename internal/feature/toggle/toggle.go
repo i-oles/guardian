@@ -1,16 +1,18 @@
 package toggle
 
 import (
+	"cmd/main.go/internal/repository/ylight"
+	"fmt"
+	"html/template"
+	"net/http"
+
 	"cmd/main.go/internal/httpapi"
 	"cmd/main.go/internal/model"
-	"fmt"
-	"github.com/akominch/yeelight"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type toggleRequest struct {
-	IP string `json:"ip"`
+	Location string `json:"location"`
 }
 
 type toggleResponse struct {
@@ -25,79 +27,52 @@ type bulbGetter interface {
 	Get(ip string) (model.Bulb, error)
 }
 
+type yeeLightToggler interface {
+	Toggle() (ylight.Response, error)
+}
+
 type Handler struct {
-	errorHandler errorHandler
-	bulbGetter   bulbGetter
+	errorHandler    errorHandler
+	bulbGetter      bulbGetter
+	yeeLightToggler yeeLightToggler
 }
 
 func NewHandler(
 	errorHandler errorHandler,
 	bulbGetter bulbGetter,
+	yeeLightToggler yeeLightToggler,
 ) *Handler {
 	return &Handler{
-		errorHandler: errorHandler,
-		bulbGetter:   bulbGetter,
+		errorHandler:    errorHandler,
+		bulbGetter:      bulbGetter,
+		yeeLightToggler: yeeLightToggler,
 	}
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	var req toggleRequest
+	loc := ctx.PostForm("location")
+	bulb := ylight.YLight{Location: loc}
 
-	if err := ctx.ShouldBindQuery(&req); err != nil {
-		h.errorHandler.Handle(ctx, http.StatusBadRequest,
-			fmt.Errorf("could not bind toggleRequest: %w", err),
-		)
-
-		return
-	}
-
-	_, err := h.bulbGetter.Get(req.IP)
+	_, err := bulb.Toggle()
 	if err != nil {
-		h.errorHandler.Handle(ctx, http.StatusBadRequest,
-			fmt.Errorf("could not find bulb %s", req.IP),
-		)
-
-		return
-	}
-
-	if err := toggleBulb(req.IP); err != nil {
 		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
-			fmt.Errorf("could not toggle bulb %s", req.IP),
+			fmt.Errorf("could not toggle bulb %s", bulb.Location),
 		)
 
 		return
 	}
 
-	ctx.JSON(
-		http.StatusOK, toggleResponse{
-			Body: httpapi.NewOkBaseResponseBody(),
-		},
-	)
-}
-
-func toggleBulb(ip string) error {
-	config := yeelight.BulbConfig{
-		Ip:     ip,
-		Effect: yeelight.Smooth,
-	}
-
-	bulb := yeelight.New(config)
-	isOn, err := bulb.IsOn()
+	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
-		return fmt.Errorf("could not check if bulb is on: %w", err)
+		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
+
+		return
 	}
 
-	if isOn {
-		_, err := bulb.TurnOff()
-		if err != nil {
-			return fmt.Errorf("could not turn off bulb: %s, err: %w", ip, err)
-		}
-	} else {
-		_, err := bulb.TurnOn()
-		if err != nil {
-			return fmt.Errorf("could not turn on bulb: %s, err: %w", ip, err)
-		}
-	}
+	err = tmpl.Execute(ctx.Writer, nil)
+	if err != nil {
+		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
 
-	return nil
+		return
+	}
 }

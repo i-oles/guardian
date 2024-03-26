@@ -10,12 +10,19 @@ type bulbType string
 
 type Bulb struct {
 	ID        string
-	IP        string
+	Name      string
 	BulbType  bulbType
 	Luminance int
 	Red       *int
 	Green     *int
 	Blue      *int
+}
+
+type BulbState struct {
+	ID       string
+	Name     string
+	Location string
+	IsOn     *bool
 }
 
 type Preset struct {

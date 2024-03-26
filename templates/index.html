@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>htmx Example</title>
+    <!-- Include htmx library -->
+    <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
+</head>
+<body>
+<h1>homestation</h1>
+<div>
+    <form>
+        {{ range .Bulbs }}
+        <button hx-post="/toggle" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>
+        {{ end }}
+    </form>
+</div>
+</body>
+</html>

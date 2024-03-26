@@ -1,7 +1,7 @@
 -- Create bulbs table
 CREATE TABLE IF NOT EXISTS bulbs (
     bulb_id VARCHAR NOT NULL PRIMARY KEY,
-    ip_addr VARCHAR(30) NOT NULL,
+    bulb_name VARCHAR(30) NOT NULL,
     type VARCHAR(30) NOT NULL,
     luminance INTEGER NOT NULL,
     red INTEGER,
