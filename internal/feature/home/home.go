@@ -2,6 +2,7 @@ package home
 
 import (
 	"cmd/main.go/internal/model"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
@@ -49,15 +50,40 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
+	bulbStates, err := h.getBulbStates(onlineBulbs, offlineBulbs)
+	if err != nil {
+		ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	tmpl, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
+
+		return
+	}
+
+	bulbStatesMapping := map[string][]model.BulbState{
+		"Bulbs": bulbStates,
+	}
+
+	err = tmpl.Execute(ctx.Writer, bulbStatesMapping)
+	if err != nil {
+		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
+
+		return
+	}
+}
+
+func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []model.Bulb) ([]model.BulbState, error) {
 	var bulbStates []model.BulbState
 	for _, bulb := range onlineBulbs {
 		b, err := h.bulbGetter.Get(bulb.ID)
 		if err != nil {
-			ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
-				"error": err.Error(),
-			})
-
-			return
+			return nil, fmt.Errorf("failed to get bulb with ID %s: %w", bulb.ID, err)
 		}
 
 		isOn := bulb.Power == "on"
@@ -81,21 +107,5 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		bulbStates = append(bulbStates, bulbState)
 	}
 
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
-
-		return
-	}
-
-	bb := map[string][]model.BulbState{
-		"Bulbs": bulbStates,
-	}
-
-	err = tmpl.Execute(ctx.Writer, bb)
-	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
-
-		return
-	}
+	return bulbStates, nil
 }
