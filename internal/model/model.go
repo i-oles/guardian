@@ -18,11 +18,19 @@ type Bulb struct {
 	Blue      *int
 }
 
+type State string
+
+const (
+	On      State = "on"
+	Off     State = "off"
+	Offline State = "offline"
+)
+
 type BulbState struct {
 	ID       string
 	Name     string
 	Location string
-	IsOn     bool
+	State    State
 }
 
 type Preset struct {

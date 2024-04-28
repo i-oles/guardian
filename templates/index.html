@@ -6,14 +6,7 @@
     <title>homestation</title>
     <!-- Include htmx library -->
     <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
-    <style>
-        .on {
-            background-color: rgb(255, 255, 0);
-        }
-        .off {
-            background-color: rgba(59, 20, 20, 0);
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
 <h1>homestation</h1>
@@ -21,10 +14,15 @@
     <form>
         {{ range .Bulbs }}
         <div>
-            <!-- Hidden fields for IsOn and Name -->
-            <input type="hidden" name="isOn" value="{{ .IsOn }}">
+            {{ if eq .State "offline" }}
+            <button disabled> {{ .Name }}</button>
+            {{ else }}
+            <input type="hidden" name="state" value="{{ .State }}">
             <input type="hidden" name="name" value="{{ .Name }}">
-            <button class="{{ if .IsOn }}on{{ else }}off{{ end }}" hx-post="/toggle" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>
+            <button class="{{ if eq .State "on" }}on{{ else }}off{{ end }}" hx-post="/toggle" hx-swap="outerHTML"
+            name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}
+            </button>
+            {{ end }}
         </div>
         {{ end }}
     </form>

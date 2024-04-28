@@ -1,6 +1,7 @@
 package toggle
 
 import (
+	"cmd/main.go/internal/model"
 	"cmd/main.go/internal/repository/ylight"
 	"fmt"
 	"net/http"
@@ -33,7 +34,7 @@ func NewHandler(
 
 func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
-	isOn := ctx.PostForm("isOn")
+	state := ctx.PostForm("state")
 	name := ctx.PostForm("name")
 
 	_, err := h.bulbToggler.Toggle(location)
@@ -44,17 +45,23 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	var bulbIsOn bool
+	var currentState model.State
 
-	if isOn == "true" {
-		bulbIsOn = false
-	} else {
-		bulbIsOn = true
+	switch state {
+	case string(model.On):
+		currentState = model.Off
+	case string(model.Off):
+		currentState = model.On
+	default:
+		h.errorHandler.Handle(ctx, http.StatusBadRequest,
+			fmt.Errorf("invalid state: %s", state))
+
+		return
 	}
 
 	ctx.HTML(http.StatusOK, "button.tmpl", gin.H{
 		"Name":     name,
 		"Location": location,
-		"IsOn":     bulbIsOn,
+		"State":    currentState,
 	})
 }

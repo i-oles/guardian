@@ -90,7 +90,7 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 			ID:       b.ID,
 			Name:     b.Name,
 			Location: bulb.Location,
-			IsOn:     bulb.Power == "on",
+			State:    model.State(bulb.Power),
 		}
 
 		bulbStates = append(bulbStates, bulbState)
@@ -98,9 +98,9 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 
 	for _, b := range offlineBulbs {
 		bulbState := model.BulbState{
-			ID:   b.ID,
-			Name: b.Name,
-			IsOn: false,
+			ID:    b.ID,
+			Name:  b.Name,
+			State: model.Offline,
 		}
 
 		bulbStates = append(bulbStates, bulbState)

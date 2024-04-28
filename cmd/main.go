@@ -54,6 +54,7 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*")
 	webApp := router.Group("/")
 
