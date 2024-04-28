@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>htmx Example</title>
+    <title>homestation</title>
     <!-- Include htmx library -->
     <script src="https://unpkg.com/htmx.org/dist/htmx.min.js"></script>
+    <style>
+        .on {
+            background-color: rgb(255, 255, 0);
+        }
+        .off {
+            background-color: rgba(59, 20, 20, 0);
+        }
+    </style>
 </head>
 <body>
 <h1>homestation</h1>
 <div>
     <form>
         {{ range .Bulbs }}
-        <button hx-post="/toggle" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>
+        <div>
+            <!-- Hidden fields for IsOn and Name -->
+            <input type="hidden" name="isOn" value="{{ .IsOn }}">
+            <input type="hidden" name="name" value="{{ .Name }}">
+            <button class="{{ if .IsOn }}on{{ else }}off{{ end }}" hx-post="/toggle" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>
+        </div>
         {{ end }}
     </form>
 </div>

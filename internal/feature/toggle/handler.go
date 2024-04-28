@@ -3,7 +3,6 @@ package toggle
 import (
 	"cmd/main.go/internal/repository/ylight"
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +13,7 @@ type errorHandler interface {
 }
 
 type bulbToggler interface {
-	Toggle() (ylight.Response, error)
+	Toggle(loc string) (ylight.Response, error)
 }
 
 type Handler struct {
@@ -33,9 +32,11 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	bulb := ylight.YLight{Location: ctx.PostForm("location")}
+	location := ctx.PostForm("location")
+	isOn := ctx.PostForm("isOn")
+	name := ctx.PostForm("name")
 
-	_, err := bulb.Toggle()
+	_, err := h.bulbToggler.Toggle(location)
 	if err != nil {
 		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
 			fmt.Errorf("failed to toggle light: %w", err))
@@ -43,17 +44,17 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		h.errorHandler.Handle(ctx, http.StatusInternalServerError, err)
+	var bulbIsOn bool
 
-		return
+	if isOn == "true" {
+		bulbIsOn = false
+	} else {
+		bulbIsOn = true
 	}
 
-	err = tmpl.Execute(ctx.Writer, nil)
-	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
-
-		return
-	}
+	ctx.HTML(http.StatusOK, "button.tmpl", gin.H{
+		"Name":     name,
+		"Location": location,
+		"IsOn":     bulbIsOn,
+	})
 }

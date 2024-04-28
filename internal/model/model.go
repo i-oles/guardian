@@ -22,7 +22,7 @@ type BulbState struct {
 	ID       string
 	Name     string
 	Location string
-	IsOn     *bool
+	IsOn     bool
 }
 
 type Preset struct {

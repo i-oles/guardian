@@ -18,7 +18,6 @@ type Response struct {
 	Error  Error       `json:"error,omitempty"`
 }
 
-// Error struct is used on the ResponseError payload
 type Error struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -38,11 +37,34 @@ func NewYLight() *YLight {
 	return &YLight{}
 }
 
-func (y *YLight) Toggle() (Response, error) {
+func (y *YLight) Toggle(loc string) (Response, error) {
+	y.Location = loc
+
 	cmd := Command{
 		ID:     1,
 		Method: "toggle",
 		Params: []string{},
+	}
+
+	return y.request(cmd)
+}
+
+func (y *YLight) SetBrightness(loc string, brightness, duration int) (Response, error) {
+	y.Location = loc
+
+	var effect string
+
+	if duration > 0 {
+		effect = "smooth"
+	} else {
+		effect = "sudden"
+		duration = 0
+	}
+
+	cmd := Command{
+		ID:     5,
+		Method: "set_bright",
+		Params: []interface{}{brightness, effect, duration},
 	}
 
 	return y.request(cmd)

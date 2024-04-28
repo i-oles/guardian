@@ -86,13 +86,11 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 			return nil, fmt.Errorf("failed to get bulb with ID %s: %w", bulb.ID, err)
 		}
 
-		isOn := bulb.Power == "on"
-
 		bulbState := model.BulbState{
 			ID:       b.ID,
 			Name:     b.Name,
 			Location: bulb.Location,
-			IsOn:     &isOn,
+			IsOn:     bulb.Power == "on",
 		}
 
 		bulbStates = append(bulbStates, bulbState)
@@ -102,6 +100,7 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 		bulbState := model.BulbState{
 			ID:   b.ID,
 			Name: b.Name,
+			IsOn: false,
 		}
 
 		bulbStates = append(bulbStates, bulbState)

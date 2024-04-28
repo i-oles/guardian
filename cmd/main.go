@@ -3,6 +3,7 @@ package main
 import (
 	errorHandler "cmd/main.go/internal/build/error"
 	"cmd/main.go/internal/config"
+	"cmd/main.go/internal/feature/brightness"
 	"cmd/main.go/internal/feature/home"
 	"cmd/main.go/internal/feature/toggle"
 	"cmd/main.go/internal/repository/sqlite"
@@ -30,23 +31,30 @@ func main() {
 	}
 
 	bulbRepo := sqlite.NewBulbsRepo(db, cfg.BulbCollName)
-	yeeLightRepo := ylight.NewYLight()
+	yeeLight := ylight.NewYLight()
 
 	homeHandler := home.NewHandler(bulbRepo)
-	toggleHandler := toggle.NewHandler(
-		errorHandler.New("toggle", cfg.IsDebugOn),
-		bulbRepo,
-		yeeLightRepo)
 
 	GETs := map[string]gin.HandlerFunc{
 		"/": homeHandler.Handle,
 	}
 
+	toggleHandler := toggle.NewHandler(
+		errorHandler.New("toggle", cfg.IsDebugOn),
+		yeeLight)
+
+	brightnessHandler := brightness.NewHandler(
+		errorHandler.New("brightness", cfg.IsDebugOn),
+		bulbRepo,
+		yeeLight)
+
 	POSTs := map[string]gin.HandlerFunc{
-		"/toggle": toggleHandler.Handle,
+		"/toggle":     toggleHandler.Handle,
+		"/brightness": brightnessHandler.Handle,
 	}
 
 	router := gin.Default()
+	router.LoadHTMLGlob("templates/*")
 	webApp := router.Group("/")
 
 	for route, handler := range GETs {

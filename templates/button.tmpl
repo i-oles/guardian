@@ -1,0 +1,1 @@
+<button class="{{ if .IsOn }}on{{ else }}off{{ end }}" hx-post="/toggle" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>

@@ -3,6 +3,7 @@ package brightness
 import (
 	"cmd/main.go/internal/model"
 	"cmd/main.go/internal/repository/ylight"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
@@ -18,12 +19,12 @@ type bulbGetter interface {
 }
 
 type brightnessSetter interface {
-	Set(ip string, brightness int) error
+	SetBrightness(loc string, brightness, duration int) (ylight.Response, error)
 }
 
 type Handler struct {
-	errorHandler    errorHandler
-	bulbGetter      bulbGetter
+	errorHandler     errorHandler
+	bulbGetter       bulbGetter
 	brightnessSetter brightnessSetter
 }
 
@@ -33,21 +34,22 @@ func NewHandler(
 	brightnessSetter brightnessSetter,
 ) *Handler {
 	return &Handler{
-		errorHandler:    errorHandler,
-		bulbGetter:      bulbGetter,
+		errorHandler:     errorHandler,
+		bulbGetter:       bulbGetter,
 		brightnessSetter: brightnessSetter,
 	}
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	loc := ctx.PostForm("location")
-	bulb := ylight.YLight{Location: loc}
+	var brightnessValue int
+	err := json.Unmarshal(
+		[]byte(ctx.PostForm("brightness")), &brightnessValue,
+	)
 
-	_, err := bulb.Toggle()
+	_, err = h.brightnessSetter.SetBrightness(ctx.PostForm("location"), brightnessValue, 1)
 	if err != nil {
 		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
-			fmt.Errorf("failed to toggle light: %w", err)
-		)
+			fmt.Errorf("failed to toggle light: %w", err))
 
 		return
 	}
