@@ -1,3 +1,1 @@
-<button class="{{ if eq .State "on" }}on{{ else }}off{{ end }}"
-hx-post="/toggle" hx-swap="outerHTML" name="location" value="{{ .Location }}"
-hx-trigger="click">{{ .Name }}</button>
+<button class="{{ if eq .State "on" }}pressed{{ end }}" hx-post="/toggle" hx-swap="outerHTML" name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}</button>

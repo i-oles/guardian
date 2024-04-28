@@ -19,7 +19,7 @@
             {{ else }}
             <input type="hidden" name="state" value="{{ .State }}">
             <input type="hidden" name="name" value="{{ .Name }}">
-            <button class="{{ if eq .State "on" }}on{{ else }}off{{ end }}" hx-post="/toggle" hx-swap="outerHTML"
+            <button class="{{ if eq .State "on" }} pressed {{ end }}" hx-post="/toggle" hx-swap="outerHTML"
             name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}
             </button>
             {{ end }}
