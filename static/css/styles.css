@@ -13,6 +13,10 @@ button.pressed {
     background-color: #ff8800;
 }
 
+button:hover {
+    background-color: #333333;
+}
+
 button:disabled {
     opacity: 0.3;
     background-color: #6c757d;
