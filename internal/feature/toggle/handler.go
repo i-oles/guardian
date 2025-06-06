@@ -1,11 +1,10 @@
 package toggle
 
 import (
-	"cmd/main.go/internal/model"
-	"cmd/main.go/internal/repository/ylight"
 	"fmt"
 	"net/http"
 
+	"cmd/main.go/internal/repository/ylight"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,10 +33,9 @@ func NewHandler(
 
 func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
-	state := ctx.PostForm("state")
 	name := ctx.PostForm("name")
 
-	_, err := h.bulbToggler.Toggle(location)
+	resp, err := h.bulbToggler.Toggle(location)
 	if err != nil {
 		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
 			fmt.Errorf("failed to toggle light: %w", err))
@@ -45,23 +43,9 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	var currentState model.State
-
-	switch state {
-	case string(model.On):
-		currentState = model.Off
-	case string(model.Off):
-		currentState = model.On
-	default:
-		h.errorHandler.Handle(ctx, http.StatusBadRequest,
-			fmt.Errorf("invalid state: %s", state))
-
-		return
-	}
-
-	ctx.HTML(http.StatusOK, "button.tmpl", gin.H{
+	ctx.HTML(http.StatusOK, "toggle.tmpl", gin.H{
 		"Name":     name,
 		"Location": location,
-		"State":    currentState,
+		"State":    resp.Params.Power,
 	})
 }

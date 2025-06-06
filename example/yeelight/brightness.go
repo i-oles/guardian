@@ -11,12 +11,12 @@ import (
 )
 
 func main() {
-	state, err := toggleEdgardBulb("192.168.0.42:55443")
+	resp, err := brightnessEdgardBulb("192.168.0.42:55443", 30, 5000)
 	if err != nil {
 		log.Fatal("fatal", err)
 	}
 
-	fmt.Println(state)
+	fmt.Println(resp)
 	return
 }
 
@@ -26,10 +26,16 @@ type Commandd struct {
 	Params interface{} `json:"params"`
 }
 
-func toggleEdgardBulb(location string) (string, error) {
+func brightnessEdgardBulb(location string, brightness, duration int) (string, error) {
+	effect := "sudden"
+
+	if duration > 0 {
+		effect = "smooth"
+	}
+
 	cmd := Commandd{
-		Method: "toggle",
-		Params: []interface{}{},
+		Method: "set_bright",
+		Params: []interface{}{brightness, effect, duration},
 	}
 
 	if cmd.ID == 0 {

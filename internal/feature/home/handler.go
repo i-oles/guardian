@@ -1,13 +1,13 @@
 package home
 
 import (
-	"cmd/main.go/internal/model"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
 	"time"
 
+	"cmd/main.go/internal/model"
+	"github.com/gin-gonic/gin"
 	"github.com/julienrbrt/yeego/light/yeelight"
 )
 
@@ -59,15 +59,15 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
+	bulbStatesMapping := map[string][]model.BulbState{
+		"Bulbs": bulbStates,
+	}
+
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
 
 		return
-	}
-
-	bulbStatesMapping := map[string][]model.BulbState{
-		"Bulbs": bulbStates,
 	}
 
 	err = tmpl.Execute(ctx.Writer, bulbStatesMapping)
@@ -87,10 +87,11 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 		}
 
 		bulbState := model.BulbState{
-			ID:       b.ID,
-			Name:     b.Name,
-			Location: bulb.Location,
-			State:    model.State(bulb.Power),
+			ID:         b.ID,
+			Name:       b.Name,
+			Location:   bulb.Location,
+			State:      model.State(bulb.Power),
+			Brightness: bulb.Bright,
 		}
 
 		bulbStates = append(bulbStates, bulbState)

@@ -9,12 +9,8 @@ button {
     transition: all 0.3s ease;
 }
 
-button:hover {
+button.pressed {
     background-color: #ff8800;
-}
-
-.pressed, button:active {
-    background-color: #ffa200;
 }
 
 button:disabled {

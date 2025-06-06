@@ -15,7 +15,7 @@
         {{ range .Bulbs }}
         <div>
             {{ if eq .State "offline" }}
-            <button disabled> {{ .Name }}</button>
+            <button disabled>{{ .Name }}</button>
             {{ else }}
             <input type="hidden" name="state" value="{{ .State }}">
             <input type="hidden" name="name" value="{{ .Name }}">
@@ -23,6 +23,12 @@
             name="location" value="{{ .Location }}" hx-trigger="click">{{ .Name }}
             </button>
             {{ end }}
+        </div>
+        <div>
+            <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
+            <input type="range" min="0" max="100" name="brightness" value="{{ .Brightness }}" class="slider"
+                   hx-post="/brightness" hx-trigger="change" hx-swap="outerHTML"
+                   hx-include="this, #location-{{ .Location }}">
         </div>
         {{ end }}
     </form>

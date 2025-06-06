@@ -1,6 +1,10 @@
 package main
 
 import (
+	"database/sql"
+	"log"
+	"log/slog"
+
 	errorHandler "cmd/main.go/internal/build/error"
 	"cmd/main.go/internal/config"
 	"cmd/main.go/internal/feature/brightness"
@@ -9,10 +13,7 @@ import (
 	"cmd/main.go/internal/repository/sqlite"
 	"cmd/main.go/internal/repository/ylight"
 	configuration "cmd/main.go/pkg/config"
-	"database/sql"
 	"github.com/gin-gonic/gin"
-	"log"
-	"log/slog"
 )
 
 func main() {
@@ -44,9 +45,7 @@ func main() {
 		yeeLight)
 
 	brightnessHandler := brightness.NewHandler(
-		errorHandler.New("brightness", cfg.IsDebugOn),
-		bulbRepo,
-		yeeLight)
+		errorHandler.New("brightness", cfg.IsDebugOn), yeeLight)
 
 	POSTs := map[string]gin.HandlerFunc{
 		"/toggle":     toggleHandler.Handle,

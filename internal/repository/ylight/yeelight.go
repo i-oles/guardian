@@ -4,27 +4,22 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net"
 	"time"
 )
 
-const (
-	timeout = 1 * time.Second
-)
-
 type Response struct {
-	ID     int         `json:"id"`
-	Result interface{} `json:"result,omitempty"`
-	Error  Error       `json:"error,omitempty"`
+	Method string `json:"method"`
+	Params Params `json:"params"`
 }
 
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+type Params struct {
+	Power string `json:"power"`
 }
 
 type Command struct {
-	ID     int         `json:"id"`
+	ID     int32       `json:"id"`
 	Method string      `json:"method"`
 	Params interface{} `json:"params"`
 }
@@ -38,68 +33,58 @@ func NewYLight() *YLight {
 }
 
 func (y *YLight) Toggle(loc string) (Response, error) {
-	y.Location = loc
-
 	cmd := Command{
-		ID:     1,
 		Method: "toggle",
-		Params: []string{},
+		Params: []interface{}{},
 	}
 
-	return y.request(cmd)
+	return request(loc, cmd)
 }
 
 func (y *YLight) SetBrightness(loc string, brightness, duration int) (Response, error) {
-	y.Location = loc
-
-	var effect string
+	effect := "sudden"
 
 	if duration > 0 {
 		effect = "smooth"
-	} else {
-		effect = "sudden"
-		duration = 0
 	}
 
 	cmd := Command{
-		ID:     5,
 		Method: "set_bright",
 		Params: []interface{}{brightness, effect, duration},
 	}
 
-	return y.request(cmd)
+	return request(loc, cmd)
 }
 
-func (y *YLight) request(cmd Command) (Response, error) {
-	conn, err := net.DialTimeout("tcp", y.Location, timeout)
-	if err != nil {
-		return Response{}, fmt.Errorf("failed to connect to light: %w", err)
-	}
-	defer conn.Close()
-
-	cmdJSON, err := json.Marshal(cmd)
-	if err != nil {
-		return Response{}, fmt.Errorf("failed to marshal command: %w", err)
+func request(loc string, cmd Command) (Response, error) {
+	if cmd.ID == 0 {
+		r := rand.NewSource(time.Now().UnixNano())
+		cmd.ID = rand.New(r).Int31()
 	}
 
-	time.Sleep(500 * time.Millisecond)
-
-	_, err = fmt.Fprintf(conn, "%s\r\n", cmdJSON)
-	if err != nil {
-		return Response{}, fmt.Errorf("failed to send command: %w", err)
-	}
-
-	data, err := bufio.NewReader(conn).ReadString('\n')
-	if err != nil {
-		return Response{}, fmt.Errorf("failed to read response: %w", err)
-	}
-
-	//parse response
-	resp := Response{}
-	err = json.Unmarshal([]byte(data), &resp)
+	conn, err := net.Dial("tcp", loc)
 	if err != nil {
 		return Response{}, err
 	}
+	defer conn.Close()
+
+	time.Sleep(300 * time.Millisecond)
+
+	cmdJSON, err := json.Marshal(cmd)
+	if err != nil {
+		return Response{}, err
+	}
+	if _, err = fmt.Fprintf(conn, "%s\r\n", cmdJSON); err != nil {
+		return Response{}, err
+	}
+
+	respStr, err := bufio.NewReader(conn).ReadString('\n')
+	if err != nil {
+		return Response{}, err
+	}
+
+	resp := Response{}
+	err = json.Unmarshal([]byte(respStr), &resp)
 
 	return resp, nil
 }

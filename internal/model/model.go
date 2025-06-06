@@ -27,10 +27,11 @@ const (
 )
 
 type BulbState struct {
-	ID       string
-	Name     string
-	Location string
-	State    State
+	ID         string
+	Name       string
+	Location   string
+	State      State
+	Brightness int
 }
 
 type Preset struct {
