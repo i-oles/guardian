@@ -4,18 +4,31 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"net"
 	"time"
 )
 
 type Response struct {
-	Method string `json:"method"`
-	Params Params `json:"params"`
+	ID     int32    `json:"id"`
+	Method string   `json:"method"`
+	Params Params   `json:"params"`
+	Result []string `json:"result"`
+	Error  Error    `json:"error"`
+}
+
+type Error struct {
+	Message string `json:"message"`
+	Code    int32  `json:"code"`
 }
 
 type Params struct {
-	Power string `json:"power"`
+	Power      string `json:"power"`
+	Hue        string `json:"hue"`
+	Saturation string `json:"sat"`
+	RGB        string `json:"rgb"`
+	Brightness string `json:"bright"`
 }
 
 type Command struct {
@@ -42,15 +55,29 @@ func (y *YLight) Toggle(loc string) (Response, error) {
 }
 
 func (y *YLight) SetBrightness(loc string, brightness, duration int) (Response, error) {
-	effect := "sudden"
-
-	if duration > 0 {
-		effect = "smooth"
-	}
-
 	cmd := Command{
 		Method: "set_bright",
-		Params: []interface{}{brightness, effect, duration},
+		Params: []interface{}{brightness, setEffect(duration), duration},
+	}
+
+	return request(loc, cmd)
+}
+
+func (y *YLight) SetRGB(loc string, red, green, blue, duration int) (Response, error) {
+	rgb := (red << 16) + (green << 8) + blue
+
+	cmd := Command{
+		Method: "set_rgb",
+		Params: []interface{}{rgb, "smooth", duration},
+	}
+
+	return request(loc, cmd)
+}
+
+func (y *YLight) PowerOff(loc string, duration int) (Response, error) {
+	cmd := Command{
+		Method: "set_power",
+		Params: []interface{}{"off", setEffect(duration), duration},
 	}
 
 	return request(loc, cmd)
@@ -83,8 +110,19 @@ func request(loc string, cmd Command) (Response, error) {
 		return Response{}, err
 	}
 
+	slog.Info("resp in string: ", slog.String("resp", respStr))
+
 	resp := Response{}
 	err = json.Unmarshal([]byte(respStr), &resp)
 
 	return resp, nil
+}
+
+func setEffect(duration int) string {
+	effect := "sudden"
+	if duration > 0 {
+		effect = "smooth"
+	}
+
+	return effect
 }

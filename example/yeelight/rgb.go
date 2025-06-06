@@ -8,7 +8,13 @@ import (
 
 func main() {
 	light := ylight.NewYLight()
-	_, err := light.Toggle("192.168.0.42:55443")
+	_, err := light.SetRGB(
+		"192.168.0.41:55443",
+		1,
+		2,
+		3,
+		3000,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

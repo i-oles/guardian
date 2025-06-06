@@ -2,6 +2,7 @@ package toggle
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"cmd/main.go/internal/repository/ylight"
@@ -33,6 +34,7 @@ func NewHandler(
 
 func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
+	slog.Info("location:", slog.String("location", location))
 	name := ctx.PostForm("name")
 
 	resp, err := h.bulbToggler.Toggle(location)

@@ -8,7 +8,10 @@ import (
 
 func main() {
 	light := ylight.NewYLight()
-	_, err := light.Toggle("192.168.0.42:55443")
+	_, err := light.PowerOff(
+		"192.168.0.42:55443",
+		2000,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
