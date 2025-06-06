@@ -1,10 +1,11 @@
 package main
 
 import (
-	"cmd/main.go/internal/repository/sqlite"
 	"database/sql"
 	"fmt"
 	"log/slog"
+
+	"cmd/main.go/internal/repository/sqlite"
 )
 
 func main() {
