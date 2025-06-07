@@ -1,0 +1,6 @@
+<div id="brightness-slider">
+    <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
+    <input class="slider" type="range" min="1" max="100" name="brightness" value="{{ .Brightness }}"
+           hx-post="/brightness" hx-swap="outerHTML" hx-target="#brightness-slider"
+           hx-trigger="change, input delay:500ms">
+</div>

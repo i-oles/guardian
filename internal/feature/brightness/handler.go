@@ -1,11 +1,13 @@
 package brightness
 
 import (
-	"cmd/main.go/internal/repository/ylight"
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"log/slog"
 	"net/http"
 	"strconv"
+
+	"cmd/main.go/internal/repository/ylight"
+	"github.com/gin-gonic/gin"
 )
 
 type errorHandler interface {
@@ -34,13 +36,15 @@ func NewHandler(
 func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
 	brightness := ctx.PostForm("brightness")
+	slog.Info("location:", slog.String("location", location))
+	slog.Info("brightness:", slog.String("brightness", brightness))
 
 	brightnessValue, err := strconv.Atoi(brightness)
 
 	_, err = h.brightnessSetter.SetBrightness(location, brightnessValue, 1)
 	if err != nil {
-		h.errorHandler.Handle(ctx, http.StatusInternalServerError,
-			fmt.Errorf("failed to toggle light: %w", err))
+		h.errorHandler.Handle(ctx, http.StatusBadRequest,
+			fmt.Errorf("invalid brightness value: %w", err))
 
 		return
 	}
