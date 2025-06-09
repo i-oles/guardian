@@ -25,10 +25,10 @@ type Error struct {
 
 type Params struct {
 	Power      string `json:"power"`
-	Hue        string `json:"hue"`
-	Saturation string `json:"sat"`
-	RGB        string `json:"rgb"`
-	Brightness string `json:"bright"`
+	Hue        int    `json:"hue"`
+	Saturation int    `json:"sat"`
+	RGB        int    `json:"rgb"`
+	Brightness int    `json:"bright"`
 }
 
 type Command struct {
@@ -38,7 +38,6 @@ type Command struct {
 }
 
 type YLight struct {
-	Location string
 }
 
 func NewYLight() *YLight {

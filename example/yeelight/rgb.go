@@ -10,7 +10,7 @@ func main() {
 	light := ylight.NewYLight()
 	_, err := light.SetRGB(
 		"192.168.0.41:55443",
-		250,
+		210,
 		1,
 		1,
 		5000,
