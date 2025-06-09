@@ -36,6 +36,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
 	slog.Info("location:", slog.String("location", location))
 	name := ctx.PostForm("name")
+	id := ctx.PostForm("id")
 
 	resp, err := h.bulbToggler.Toggle(location)
 	if err != nil {
@@ -46,6 +47,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	}
 
 	ctx.HTML(http.StatusOK, "toggle.tmpl", gin.H{
+		"ID":       id,
 		"Name":     name,
 		"Location": location,
 		"State":    resp.Params.Power,

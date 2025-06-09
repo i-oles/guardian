@@ -13,30 +13,46 @@
 <div>
     <form>
         {{ range .Bulbs }}
-        <div>
-            {{ if eq .State "offline" }}
-            <div id="toggle-button">
-                <button disabled>{{ .Name }}</button>
-            </div>
-            <div id="brightness-slider">
-                <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
-                <input class="slider" type="range" min="1" max="100" name="brightness" value="{{ .Brightness }}" disabled>
-            </div>
-            {{ else }}
-            <div id="toggle-button">
-                <button class="{{ if eq .State "on" }} pressed {{ end }}" hx-post="/toggle" hx-swap="outerHTML" hx-target="#toggle-button" name="location" value="{{ .Location }}" hx-trigger="click">
-                {{ .Name }}
-                </button>
-                <input type="hidden" name="state" value="{{ .State }}">
-                <input type="hidden" name="name" value="{{ .Name }}">
-            </div>
-            <div id="brightness-slider">
-                <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
-                <input class="slider" type="range" min="1" max="100" name="brightness" value="{{ .Brightness }}"
-                       hx-post="/brightness" hx-swap="outerHTML" hx-target="#brightness-slider"
-                       hx-trigger="change, input delay:500ms">
-            </div>
-            {{ end }}
+        <div class="bulb-container">
+            <form id="form-{{ .ID }}">
+                {{ if eq .State "offline" }}
+                <div id="toggle-button-{{ .ID }}">
+                    <button disabled>{{ .Name }}</button>
+                </div>
+                <div id="brightness-slider-{{ .ID }}">
+                    <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
+                    <input class="slider" type="range" min="1" max="100" name="brightness" value="{{ .Brightness }}"
+                           disabled>
+                </div>
+                {{ else }}
+                <div id="toggle-button-{{ .ID }}">
+                    <button
+                            hx-post="/toggle"
+                            hx-swap="outerHTML"
+                            hx-target="#toggle-button-{{ .ID }}"
+                            hx-vals='{"id": "{{ .ID }}", "name": "{{ .Name }}", "location": "{{ .Location }}", "state": "{{ .State }}"}'
+                            hx-trigger="click"
+                            class="{{ if eq .State "on" }}pressed{{ end }}">
+                    {{ .Name }}
+                    </button>
+                </div>
+                <div id="brightness-slider-{{ .ID }}">
+                    <input type="hidden" name="location" value="{{ .Location }}">
+                    <input type="hidden" name="id" value="{{ .ID }}">
+                    <input class="slider"
+                           type="range"
+                           min="1"
+                           max="100"
+                           name="brightness"
+                           value="{{ .Brightness }}"
+                           hx-post="/brightness"
+                           hx-swap="outerHTML"
+                           hx-target="#brightness-slider-{{ .ID }}"
+                           hx-trigger="input delay:300ms, change"
+                           hx-include="[name='brightness'], [name='location'], [name='id']">
+                </div>
+                {{ end }}
+            </form>
         </div>
         {{ end }}
     </form>

@@ -34,10 +34,21 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
+	id := ctx.PostForm("id")
 	location := ctx.PostForm("location")
 	brightness := ctx.PostForm("brightness")
-	slog.Info("location:", slog.String("location", location))
-	slog.Info("brightness:", slog.String("brightness", brightness))
+
+	if id == "" || location == "" || brightness == "" {
+		h.errorHandler.Handle(ctx, http.StatusBadRequest,
+			fmt.Errorf("missing required parameters"))
+		return
+	}
+
+	slog.Info("Brightness request",
+		"all_params", ctx.Request.PostForm,
+		"id", id,
+		"location", location,
+		"brightness", brightness) // Dodaj to logowanie
 
 	brightnessValue, err := strconv.Atoi(brightness)
 
@@ -50,6 +61,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	}
 
 	ctx.HTML(http.StatusOK, "brightness.tmpl", gin.H{
+		"ID":         id,
 		"Location":   location,
 		"Brightness": brightnessValue,
 	})

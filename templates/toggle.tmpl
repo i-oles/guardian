@@ -1,7 +1,11 @@
-<div id="toggle-button">
-    <button class="{{ if eq .State "on" }} pressed {{ end }}" hx-post="/toggle" hx-swap="outerHTML" hx-target="#toggle-button" name="location" value="{{ .Location }}" hx-trigger="click">
-        {{ .Name }}
-    </button>
-    <input type="hidden" name="state" value="{{ .State }}">
-    <input type="hidden" name="name" value="{{ .Name }}">
+<div id="toggle-button-{{ .ID }}">
+<button
+    hx-post="/toggle"
+    hx-swap="outerHTML"
+    hx-target="#toggle-button-{{ .ID }}"
+    hx-vals='{"id": "{{ .ID }}", "name": "{{ .Name }}", "location": "{{ .Location }}", "state": "{{ .State }}"}'
+    hx-trigger="click"
+    class="{{ if eq .State "on" }}pressed{{ end }}">
+    {{ .Name }}
+</button>
 </div>

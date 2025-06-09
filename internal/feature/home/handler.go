@@ -3,6 +3,7 @@ package home
 import (
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -93,6 +94,8 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 			State:      model.State(bulb.Power),
 			Brightness: bulb.Bright,
 		}
+
+		slog.Info("Bulb state retrieved", "id", b.ID, "name", b.Name)
 
 		bulbStates = append(bulbStates, bulbState)
 	}

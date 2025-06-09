@@ -10,10 +10,10 @@ func main() {
 	light := ylight.NewYLight()
 	_, err := light.SetRGB(
 		"192.168.0.41:55443",
+		250,
 		1,
-		2,
-		3,
-		3000,
+		1,
+		5000,
 	)
 	if err != nil {
 		log.Fatal(err)

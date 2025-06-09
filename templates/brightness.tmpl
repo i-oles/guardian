@@ -1,6 +1,15 @@
-<div id="brightness-slider">
-    <input type="hidden" id="location-{{ .Location }}" name="location" value="{{ .Location }}">
-    <input class="slider" type="range" min="1" max="100" name="brightness" value="{{ .Brightness }}"
-           hx-post="/brightness" hx-swap="outerHTML" hx-target="#brightness-slider"
-           hx-trigger="change, input delay:500ms">
+<div id="brightness-slider-{{ .ID }}">
+    <input type="hidden" name="location" value="{{ .Location }}">
+    <input type="hidden" name="id" value="{{ .ID }}">
+    <input class="slider"
+           type="range"
+           min="1"
+           max="100"
+           name="brightness"
+           value="{{ .Brightness }}"
+           hx-post="/brightness"
+           hx-swap="outerHTML"
+           hx-target="#brightness-slider-{{ .ID }}"
+           hx-trigger="input delay:300ms, change"
+           hx-include="[name='brightness'], [name='location'], [name='id']">
 </div>
