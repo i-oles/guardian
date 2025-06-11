@@ -34,10 +34,15 @@ func NewHandler(
 
 func (h *Handler) Handle(ctx *gin.Context) {
 	location := ctx.PostForm("location")
-	slog.Info("location:", slog.String("location", location))
 	name := ctx.PostForm("name")
 	id := ctx.PostForm("id")
 	brightness := ctx.PostForm("brightness")
+
+	slog.Info("Bulb state",
+		"id", id,
+		"name", name,
+		"location", location,
+		"brightness", brightness)
 
 	resp, err := h.bulbToggler.Toggle(location)
 	if err != nil {
