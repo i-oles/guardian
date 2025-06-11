@@ -22,3 +22,16 @@ button:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
 }
+
+.bulb-container {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
