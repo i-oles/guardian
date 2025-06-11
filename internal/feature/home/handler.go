@@ -28,7 +28,7 @@ func NewHandler(bulbGetter bulbGetter) *Handler {
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	onlineBulbs, err := yeelight.Discover(1 * time.Second)
+	onlineBulbs, err := yeelight.Discover(2 * time.Second)
 	if err != nil {
 		ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
 			"error": err.Error(),

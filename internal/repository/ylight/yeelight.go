@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"net"
 	"time"
+
+	"cmd/main.go/internal/model"
 )
 
 type Response struct {
@@ -76,7 +78,7 @@ func (y *YLight) SetRGB(loc string, red, green, blue, duration int) (Response, e
 func (y *YLight) PowerOff(loc string, duration int) (Response, error) {
 	cmd := Command{
 		Method: "set_power",
-		Params: []interface{}{"off", setEffect(duration), duration},
+		Params: []interface{}{model.Off, setEffect(duration), duration},
 	}
 
 	return request(loc, cmd)

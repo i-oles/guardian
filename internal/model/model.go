@@ -2,29 +2,24 @@ package model
 
 const (
 	whiteType bulbType = "white"
-	//TODO: check this type
-	rgbType bulbType = "rgb"
+	rgbType   bulbType = "rgb"
+	On        State    = "on"
+	Off       State    = "off"
+	Offline   State    = "offline"
 )
 
 type bulbType string
-
-type Bulb struct {
-	ID        string
-	Name      string
-	BulbType  bulbType
-	Luminance int
-	Red       *int
-	Green     *int
-	Blue      *int
-}
-
 type State string
 
-const (
-	On      State = "on"
-	Off     State = "off"
-	Offline State = "offline"
-)
+type Bulb struct {
+	ID         string
+	Name       string
+	BulbType   bulbType
+	Brightness int
+	Red        *int
+	Green      *int
+	Blue       *int
+}
 
 type BulbState struct {
 	ID         string
@@ -35,8 +30,8 @@ type BulbState struct {
 }
 
 type Preset struct {
-	ID        int
-	Name      string
-	BulbID    string
-	Luminance int
+	ID         int
+	Name       string
+	BulbID     string
+	Brightness int
 }
