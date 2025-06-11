@@ -7,10 +7,9 @@
            max="100"
            name="brightness"
            value="{{ .Brightness }}"
-           {{ if eq .State "off" }}disabled{{ end }}
-    hx-post="/brightness"
-    hx-swap="outerHTML"
-    hx-target="#brightness-slider-{{ .ID }}"
-    hx-trigger="input delay:300ms, change"
-    hx-include="[name='brightness'], [name='location'], [name='id']">
+           hx-post="/brightness"
+           hx-swap="outerHTML"
+           hx-target="#brightness-slider-{{ .ID }}"
+           hx-trigger="input delay:300ms, change"
+           hx-include="[name='brightness'], [name='location'], [name='id']">
 </div>
