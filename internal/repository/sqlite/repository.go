@@ -10,19 +10,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type BulbsRepo struct {
+type BulbRepo struct {
 	db        *sql.DB
 	tableName string
 }
 
-func NewBulbsRepo(db *sql.DB, tableName string) *BulbsRepo {
-	return &BulbsRepo{
+func NewBulbRepo(db *sql.DB, tableName string) *BulbRepo {
+	return &BulbRepo{
 		db:        db,
 		tableName: tableName,
 	}
 }
 
-func (r *BulbsRepo) Get(id string) (model.Bulb, error) {
+func (r *BulbRepo) Get(id string) (model.Bulb, error) {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE bulb_id = ? LIMIT 1", r.tableName)
 
 	var bulb model.Bulb
@@ -40,7 +40,7 @@ func (r *BulbsRepo) Get(id string) (model.Bulb, error) {
 	}
 }
 
-func (r *BulbsRepo) GetOfflineBulbs(onlineIDs []string) ([]model.Bulb, error) {
+func (r *BulbRepo) GetOfflineBulbs(onlineIDs []string) ([]model.Bulb, error) {
 	if len(onlineIDs) == 0 {
 		return r.getAllBulbs()
 	}
@@ -95,7 +95,7 @@ func getBulbs(rows *sql.Rows) ([]model.Bulb, error) {
 	return bulbs, nil
 }
 
-func (r *BulbsRepo) getAllBulbs() ([]model.Bulb, error) {
+func (r *BulbRepo) getAllBulbs() ([]model.Bulb, error) {
 	query := fmt.Sprintf("SELECT * FROM %s", r.tableName)
 
 	rows, err := r.db.Query(query)

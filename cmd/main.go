@@ -5,13 +5,13 @@ import (
 	"log"
 	"log/slog"
 
-	errorHandler "cmd/main.go/internal/build/error"
+	"cmd/main.go/internal/api/http"
+	"cmd/main.go/internal/bulb/controller"
 	"cmd/main.go/internal/config"
-	"cmd/main.go/internal/feature/brightness"
-	"cmd/main.go/internal/feature/home"
-	"cmd/main.go/internal/feature/toggle"
+	"cmd/main.go/internal/handler/brightness"
+	"cmd/main.go/internal/handler/home"
+	"cmd/main.go/internal/handler/toggle"
 	"cmd/main.go/internal/repository/sqlite"
-	"cmd/main.go/internal/repository/ylight"
 	configuration "cmd/main.go/pkg/config"
 	"github.com/gin-gonic/gin"
 )
@@ -31,21 +31,25 @@ func main() {
 		slog.Error(err.Error())
 	}
 
-	bulbRepo := sqlite.NewBulbsRepo(db, cfg.BulbCollName)
-	yeeLight := ylight.NewYLight()
+	bulbRepo := sqlite.NewBulbRepo(db, cfg.BulbCollName)
+	bulbController := controller.NewYeeLight()
 
-	homeHandler := home.NewHandler(bulbRepo)
+	homeHandler := home.NewHandler(
+		bulbRepo,
+		http.NewAPIResponder("/home", cfg.IsDebugOn),
+	)
 
 	GETs := map[string]gin.HandlerFunc{
 		"/": homeHandler.Handle,
 	}
 
 	toggleHandler := toggle.NewHandler(
-		errorHandler.New("toggle", cfg.IsDebugOn),
-		yeeLight)
+		http.NewAPIResponder("/toggle", cfg.IsDebugOn),
+		bulbController)
 
 	brightnessHandler := brightness.NewHandler(
-		errorHandler.New("brightness", cfg.IsDebugOn), yeeLight)
+		http.NewAPIResponder("/brightness", cfg.IsDebugOn),
+		bulbController)
 
 	POSTs := map[string]gin.HandlerFunc{
 		"/toggle":     toggleHandler.Handle,

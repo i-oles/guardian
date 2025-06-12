@@ -3,36 +3,35 @@ package home
 import (
 	"fmt"
 	"html/template"
-	"log/slog"
 	"net/http"
 	"time"
 
+	"cmd/main.go/internal/api"
 	"cmd/main.go/internal/model"
+	"cmd/main.go/internal/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/julienrbrt/yeego/light/yeelight"
 )
 
-type bulbGetter interface {
-	Get(id string) (model.Bulb, error)
-	GetOfflineBulbs(onlineIDs []string) ([]model.Bulb, error)
-}
-
 type Handler struct {
-	bulbGetter bulbGetter
+	bulbRepo     repository.Bulb
+	apiResponder api.Responder
 }
 
-func NewHandler(bulbGetter bulbGetter) *Handler {
+func NewHandler(
+	bulbRepo repository.Bulb,
+	apiResponder api.Responder,
+) *Handler {
 	return &Handler{
-		bulbGetter: bulbGetter,
+		bulbRepo:     bulbRepo,
+		apiResponder: apiResponder,
 	}
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	onlineBulbs, err := yeelight.Discover(2 * time.Second)
+	onlineBulbs, err := yeelight.Discover(1 * time.Second)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
-			"error": err.Error(),
-		})
+		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -42,20 +41,16 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		onlineIDs[i] = bulb.ID
 	}
 
-	offlineBulbs, err := h.bulbGetter.GetOfflineBulbs(onlineIDs)
+	offlineBulbs, err := h.bulbRepo.GetOfflineBulbs(onlineIDs)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
-			"error": err.Error(),
-		})
+		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	bulbStates, err := h.getBulbStates(onlineBulbs, offlineBulbs)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", gin.H{
-			"error": err.Error(),
-		})
+		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -66,14 +61,14 @@ func (h *Handler) Handle(ctx *gin.Context) {
 
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
+		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
 
 	err = tmpl.Execute(ctx.Writer, bulbStatesMapping)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "index.html", nil)
+		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -82,7 +77,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []model.Bulb) ([]model.BulbState, error) {
 	var bulbStates []model.BulbState
 	for _, bulb := range onlineBulbs {
-		b, err := h.bulbGetter.Get(bulb.ID)
+		b, err := h.bulbRepo.Get(bulb.ID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get bulb with ID %s: %w", bulb.ID, err)
 		}
@@ -94,8 +89,6 @@ func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []
 			State:      model.State(bulb.Power),
 			Brightness: bulb.Bright,
 		}
-
-		slog.Info("Bulb state retrieved", "id", b.ID, "name", b.Name)
 
 		bulbStates = append(bulbStates, bulbState)
 	}

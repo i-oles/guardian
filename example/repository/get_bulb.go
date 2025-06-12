@@ -14,7 +14,7 @@ func main() {
 		slog.Error(err.Error())
 	}
 
-	bulbRepo := sqlite.NewBulbsRepo(db, "bulbs")
+	bulbRepo := sqlite.NewBulbRepo(db, "bulbs")
 	bulb, err := bulbRepo.Get("192.168.0.15")
 	if err != nil {
 		slog.Error("Error getting bulb: " + err.Error())

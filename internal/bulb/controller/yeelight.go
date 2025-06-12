@@ -1,10 +1,9 @@
-package ylight
+package controller
 
 import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"math/rand"
 	"net"
 	"time"
@@ -39,14 +38,14 @@ type Command struct {
 	Params interface{} `json:"params"`
 }
 
-type YLight struct {
+type YeeLight struct {
 }
 
-func NewYLight() *YLight {
-	return &YLight{}
+func NewYeeLight() *YeeLight {
+	return &YeeLight{}
 }
 
-func (y *YLight) Toggle(loc string) (Response, error) {
+func (y *YeeLight) Toggle(loc string) (Response, error) {
 	cmd := Command{
 		Method: "toggle",
 		Params: []interface{}{},
@@ -55,7 +54,7 @@ func (y *YLight) Toggle(loc string) (Response, error) {
 	return request(loc, cmd)
 }
 
-func (y *YLight) SetBrightness(loc string, brightness, duration int) (Response, error) {
+func (y *YeeLight) SetBrightness(loc string, brightness, duration int) (Response, error) {
 	cmd := Command{
 		Method: "set_bright",
 		Params: []interface{}{brightness, setEffect(duration), duration},
@@ -64,7 +63,7 @@ func (y *YLight) SetBrightness(loc string, brightness, duration int) (Response, 
 	return request(loc, cmd)
 }
 
-func (y *YLight) SetRGB(loc string, red, green, blue, duration int) (Response, error) {
+func (y *YeeLight) SetRGB(loc string, red, green, blue, duration int) (Response, error) {
 	rgb := (red << 16) + (green << 8) + blue
 
 	cmd := Command{
@@ -75,7 +74,7 @@ func (y *YLight) SetRGB(loc string, red, green, blue, duration int) (Response, e
 	return request(loc, cmd)
 }
 
-func (y *YLight) PowerOff(loc string, duration int) (Response, error) {
+func (y *YeeLight) PowerOff(loc string, duration int) (Response, error) {
 	cmd := Command{
 		Method: "set_power",
 		Params: []interface{}{model.Off, setEffect(duration), duration},
@@ -92,7 +91,7 @@ func request(loc string, cmd Command) (Response, error) {
 
 	conn, err := net.Dial("tcp", loc)
 	if err != nil {
-		return Response{}, err
+		return Response{}, fmt.Errorf("could not connect to %s", loc)
 	}
 	defer conn.Close()
 
@@ -103,15 +102,13 @@ func request(loc string, cmd Command) (Response, error) {
 		return Response{}, err
 	}
 	if _, err = fmt.Fprintf(conn, "%s\r\n", cmdJSON); err != nil {
-		return Response{}, err
+		return Response{}, fmt.Errorf("could not send command to %s", loc)
 	}
 
 	respStr, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
-		return Response{}, err
+		return Response{}, fmt.Errorf("could not read from %s", loc)
 	}
-
-	slog.Info("resp in string: ", slog.String("resp", respStr))
 
 	resp := Response{}
 	err = json.Unmarshal([]byte(respStr), &resp)
