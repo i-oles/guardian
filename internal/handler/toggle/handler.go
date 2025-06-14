@@ -1,6 +1,7 @@
 package toggle
 
 import (
+	"fmt"
 	"net/http"
 
 	"cmd/main.go/internal/api"
@@ -28,6 +29,13 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	name := ctx.PostForm("name")
 	id := ctx.PostForm("id")
 	brightness := ctx.PostForm("brightness")
+
+	if id == "" || location == "" || brightness == "" || name == "" {
+		h.apiResponder.Error(ctx, http.StatusBadRequest,
+			fmt.Errorf("missing required parameters"))
+
+		return
+	}
 
 	resp, err := h.bulbController.Toggle(location)
 	if err != nil {

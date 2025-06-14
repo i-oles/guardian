@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	light := controller.NewYeeLight()
-	_, err := light.PowerOff(
+	bulbController := controller.NewYeeLight()
+	_, err := bulbController.PowerOff(
 		"192.168.0.42:55443",
 		2000,
 	)

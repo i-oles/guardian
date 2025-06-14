@@ -6,7 +6,7 @@ type Configuration struct {
 	DBFileName   string
 	BulbCollName string
 	MockBulbs    bool
-	IsDebugOn    bool
+	Logging      bool
 }
 
 func (c *Configuration) Pretty() string {

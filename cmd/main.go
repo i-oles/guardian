@@ -36,7 +36,7 @@ func main() {
 
 	homeHandler := home.NewHandler(
 		bulbRepo,
-		http.NewAPIResponder("/home", cfg.IsDebugOn),
+		http.NewAPIResponder("/home", cfg.Logging),
 	)
 
 	GETs := map[string]gin.HandlerFunc{
@@ -44,11 +44,11 @@ func main() {
 	}
 
 	toggleHandler := toggle.NewHandler(
-		http.NewAPIResponder("/toggle", cfg.IsDebugOn),
+		http.NewAPIResponder("/toggle", cfg.Logging),
 		bulbController)
 
 	brightnessHandler := brightness.NewHandler(
-		http.NewAPIResponder("/brightness", cfg.IsDebugOn),
+		http.NewAPIResponder("/brightness", cfg.Logging),
 		bulbController)
 
 	POSTs := map[string]gin.HandlerFunc{

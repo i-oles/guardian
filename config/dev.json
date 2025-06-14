@@ -1,6 +1,6 @@
 {
   "DBFileName": "guardian.db",
   "MockBulbs" :  false,
-  "IsDebugOn" :  true,
+  "Logging" :  true,
   "BulbCollName" : "bulbs"
 }

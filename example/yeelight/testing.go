@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	light := yeelight.Light{}
-	light.SetRGB()
+	_ = yeelight.Light{}
 }

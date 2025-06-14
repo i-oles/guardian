@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	light := controller.NewYeeLight()
-	_, err := light.SetRGB(
+	bulbController := controller.NewYeeLight()
+	_, err := bulbController.SetRGB(
 		"192.168.0.41:55443",
 		210,
 		1,
