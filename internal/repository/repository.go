@@ -4,7 +4,10 @@ import (
 	"cmd/main.go/internal/model"
 )
 
-type Bulb interface {
+type BulbGetter interface {
 	Get(id string) (model.Bulb, error)
+}
+
+type OfflineBulbsGetter interface {
 	GetOfflineBulbs(onlineIDs []string) ([]model.Bulb, error)
 }

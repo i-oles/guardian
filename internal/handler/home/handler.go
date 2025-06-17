@@ -14,17 +14,20 @@ import (
 )
 
 type Handler struct {
-	bulbRepo     repository.Bulb
-	apiResponder api.Responder
+	bulbGetter         repository.BulbGetter
+	offlineBulbsGetter repository.OfflineBulbsGetter
+	apiResponder       api.Responder
 }
 
 func NewHandler(
-	bulbRepo repository.Bulb,
+	bulbGetter repository.BulbGetter,
+	offlineBulbsGetter repository.OfflineBulbsGetter,
 	apiResponder api.Responder,
 ) *Handler {
 	return &Handler{
-		bulbRepo:     bulbRepo,
-		apiResponder: apiResponder,
+		bulbGetter:         bulbGetter,
+		offlineBulbsGetter: offlineBulbsGetter,
+		apiResponder:       apiResponder,
 	}
 }
 
@@ -41,7 +44,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		onlineIDs[i] = bulb.ID
 	}
 
-	offlineBulbs, err := h.bulbRepo.GetOfflineBulbs(onlineIDs)
+	offlineBulbs, err := h.offlineBulbsGetter.GetOfflineBulbs(onlineIDs)
 	if err != nil {
 		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 
@@ -77,7 +80,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 func (h *Handler) getBulbStates(onlineBulbs []yeelight.Yeelight, offlineBulbs []model.Bulb) ([]model.BulbState, error) {
 	var bulbStates []model.BulbState
 	for _, bulb := range onlineBulbs {
-		b, err := h.bulbRepo.Get(bulb.ID)
+		b, err := h.bulbGetter.Get(bulb.ID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get bulb with ID %s: %w", bulb.ID, err)
 		}

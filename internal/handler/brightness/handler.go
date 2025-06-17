@@ -11,17 +11,17 @@ import (
 )
 
 type Handler struct {
-	bulbController bulb.Controller
-	apiResponder   api.Responder
+	brightnessSetter bulb.BrightnessSetter
+	apiResponder     api.Responder
 }
 
 func NewHandler(
 	apiResponder api.Responder,
-	bulbController bulb.Controller,
+	brightnessSetter bulb.BrightnessSetter,
 ) *Handler {
 	return &Handler{
-		apiResponder:   apiResponder,
-		bulbController: bulbController,
+		apiResponder:     apiResponder,
+		brightnessSetter: brightnessSetter,
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 
 	brightnessValue, err := strconv.Atoi(brightness)
 
-	_, err = h.bulbController.SetBrightness(location, brightnessValue, 1)
+	_, err = h.brightnessSetter.SetBrightness(location, brightnessValue, 1)
 	if err != nil {
 		h.apiResponder.Error(ctx, http.StatusBadRequest,
 			fmt.Errorf("invalid brightness value: %w", err))

@@ -10,17 +10,17 @@ import (
 )
 
 type Handler struct {
-	apiResponder   api.Responder
-	bulbController bulb.Controller
+	apiResponder api.Responder
+	toggler      bulb.Toggler
 }
 
 func NewHandler(
 	apiResponder api.Responder,
-	bulbController bulb.Controller,
+	toggler bulb.Toggler,
 ) *Handler {
 	return &Handler{
-		apiResponder:   apiResponder,
-		bulbController: bulbController,
+		apiResponder: apiResponder,
+		toggler:      toggler,
 	}
 }
 
@@ -37,7 +37,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.bulbController.Toggle(location)
+	resp, err := h.toggler.Toggle(location)
 	if err != nil {
 		h.apiResponder.Error(ctx, http.StatusInternalServerError, err)
 

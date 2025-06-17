@@ -1,11 +1,9 @@
 package model
 
 const (
-	whiteType bulbType = "white"
-	rgbType   bulbType = "rgb"
-	On        State    = "on"
-	Off       State    = "off"
-	Offline   State    = "offline"
+	On      State = "on"
+	Off     State = "off"
+	Offline State = "offline"
 )
 
 type bulbType string
@@ -26,12 +24,5 @@ type BulbState struct {
 	Name       string
 	Location   string
 	State      State
-	Brightness int
-}
-
-type Preset struct {
-	ID         int
-	Name       string
-	BulbID     string
 	Brightness int
 }

@@ -35,7 +35,7 @@ func main() {
 	bulbController := controller.NewYeeLight()
 
 	homeHandler := home.NewHandler(
-		bulbRepo,
+		bulbRepo, bulbRepo,
 		http.NewAPIResponder("/home", cfg.Logging),
 	)
 

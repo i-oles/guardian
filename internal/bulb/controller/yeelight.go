@@ -95,7 +95,7 @@ func request(loc string, cmd Command) (Response, error) {
 	}
 	defer conn.Close()
 
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	cmdJSON, err := json.Marshal(cmd)
 	if err != nil {
