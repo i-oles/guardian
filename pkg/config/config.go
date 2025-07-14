@@ -2,9 +2,10 @@ package config
 
 import (
 	"flag"
-	"github.com/tkanos/gonfig"
 	"log/slog"
 	"path/filepath"
+
+	"github.com/tkanos/gonfig"
 )
 
 const (
